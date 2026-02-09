@@ -95,16 +95,73 @@ make down
 A typical successful run looks roughly like:
 
 ```text
-db-1   | Database system is ready to accept connections
-db-1   | Executing /docker-entrypoint-initdb.d/init.sql ...
-db-1   | Initialization complete
-app-1  | Connecting to database at db:5432 ...
-app-1  | Running query: SELECT * FROM some_table;
-app-1  | Found 3 rows, writing results to /out/results.json
-app-1  | Job finished successfully
+db-1  | 2026-02-09 04:28:27.906 UTC [48] LOG:  database system is shut down
+db-1  |  done
+db-1  | server stopped
+db-1  | 
+db-1  | PostgreSQL init process complete; ready for start up.
+db-1  | 
+db-1  | 2026-02-09 04:28:28.018 UTC [1] LOG:  starting PostgreSQL 16.11 (Debian 16.11-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+db-1  | 2026-02-09 04:28:28.019 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+db-1  | 2026-02-09 04:28:28.019 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+db-1  | 2026-02-09 04:28:28.025 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+db-1  | 2026-02-09 04:28:28.038 UTC [66] LOG:  database system was shut down at 2026-02-09 04:28:27 UTC
+db-1  | 2026-02-09 04:28:28.044 UTC [1] LOG:  database system is ready to accept connections
+Container cc_assignment_1-db-1 Healthy 
+app-1  | === Summary ===
+app-1  | {
+app-1  |   "total_trips": 6,
+app-1  |   "avg_fare_by_city": [
+app-1  |     {
+app-1  |       "city": "Charlotte",
+app-1  |       "avg_fare": 16.25
+app-1  |     },
+app-1  |     {
+app-1  |       "city": "New York",
+app-1  |       "avg_fare": 19.0
+app-1  |     },
+app-1  |     {
+app-1  |       "city": "San Francisco",
+app-1  |       "avg_fare": 20.25
+app-1  |     }
+app-1  |   ],
+app-1  |   "top_by_minutes": [
+app-1  |     {
+app-1  |       "city": "San Francisco",
+app-1  |       "minutes": 28,
+app-1  |       "fare": 29.3
+app-1  |     },
+app-1  |     {
+app-1  |       "city": "New York",
+app-1  |       "minutes": 26,
+app-1  |       "fare": 27.1
+app-1  |     },
+app-1  |     {
+app-1  |       "city": "Charlotte",
+app-1  |       "minutes": 21,
+app-1  |       "fare": 20.0
+app-1  |     },
+app-1  |     {
+app-1  |       "city": "Charlotte",
+app-1  |       "minutes": 12,
+app-1  |       "fare": 12.5
+app-1  |     },
+app-1  |     {
+app-1  |       "city": "San Francisco",
+app-1  |       "minutes": 11,
+app-1  |       "fare": 11.2
+app-1  |     },
+app-1  |     {
+app-1  |       "city": "New York",
+app-1  |       "minutes": 9,
+app-1  |       "fare": 10.9
+app-1  |     }
+app-1  |   ]
+app-1  | }
+app-1 exited with code 0
 ```
 
-- These logs appear in your terminal with `docker compose up`.
+- These logs appear in your terminal with `docker compose up --build`.
 - Result files are written into `./out/` on your host machine (mapped inside the container, usually to `/out`).
 
 You can inspect them with:
@@ -130,45 +187,9 @@ To change ports, credentials, or volume mappings, edit `compose.yml` and restart
 
 ---
 
-## Useful commands
-
-```bash
-# Start (foreground)
-docker compose up --build
-
-# Start detached
-docker compose up -d
-
-# Tail logs from all services
-docker compose logs -f
-
-# Tail only app logs
-docker compose logs -f app
-
-# Tail only db logs
-docker compose logs -f db
-
-# Stop and remove containers (keep volumes)
-docker compose down
-
-# Stop and remove containers + volumes (reset DB)
-docker compose down -v
-```
-
-If you work with the Makefile, you might also use:
-
-```bash
-make build   # build images
-make up      # start services
-make down    # stop services
-make logs    # (if defined) follow logs
-```
-
----
-
 ## Where outputs are written
 
-- On host: `./out/` in the project root.
+- On host: `./out/summary.json` in the project root.
 - In the app container: whatever directory `./out` is mapped to (commonly `/out`).
 
 Ensure `out/` exists before running:
